@@ -17,7 +17,7 @@ export class Article implements IArticle {
   private _created: Date;
   private _modified: Date;
   private _tags: Array<Tag>;
-  private _category: Category;
+  private _category: Category | null;
 
   constructor({
     content,
@@ -30,6 +30,8 @@ export class Article implements IArticle {
     this._content = content;
     this._created = new Date(created);
     this._modified = new Date(modified);
+    this._tags = [];
+    this._category = null;
   }
 
   public get id(): string {
@@ -56,7 +58,7 @@ export class Article implements IArticle {
     return this._tags;
   }
 
-  public get category(): Category {
+  public get category(): Category | null {
     return this._category;
   }
 

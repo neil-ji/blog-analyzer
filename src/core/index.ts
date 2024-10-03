@@ -43,13 +43,13 @@ export const analyze = async (
     });
 
     // 3. Tag 和 Category 实例化，同时建立与 Article 的关系
-    const tags: Tag[] = (data[frontmatterKeys.tag] || []).map((tag) => {
+    const tags: Tag[] = (data[frontmatterKeys.tag] || []).map((tag: string) => {
       const tagInstance = createTag(tag)({ name: tag });
       tagInstance.article = article;
       return tagInstance;
     });
     const categories: Category[] = (data[frontmatterKeys.category] || []).map(
-      (category) => {
+      (category: string) => {
         const categoryInstance = createCategory(category)({ name: category });
         categoryInstance.article = article;
         return categoryInstance;
@@ -68,8 +68,8 @@ export const analyze = async (
   }, true);
 
   return {
-    articles: articleCollector,
-    categories: categoryTree,
-    tags: tagSet,
+    articleCollector,
+    categoryTree,
+    tagSet,
   };
 };

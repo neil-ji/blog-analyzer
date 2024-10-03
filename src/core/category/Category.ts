@@ -1,8 +1,8 @@
 import { Article } from "../article/Article";
-import { ICategoryNode } from "../../interface";
+import { ICategory } from "../../interface";
 import { getId } from "../../util";
 
-export class Category implements ICategoryNode {
+export class Category implements ICategory {
   private _id: string;
   private _name: string;
   private _parent: Category | null;
