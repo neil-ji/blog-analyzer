@@ -8,9 +8,9 @@ export class Category implements ICategory {
   private _parent: Category | null;
   private _children: Category[];
   private _articles: Article[];
-  constructor(rawCategory: string) {
-    this._id = getId(rawCategory);
-    this._name = rawCategory;
+  constructor(name: string) {
+    this._id = getId(name);
+    this._name = name;
     this._parent = null;
     this._children = [];
     this._articles = [];
@@ -42,13 +42,16 @@ export class Category implements ICategory {
     }
   }
 
-  public set child(category: Category) {
-    if (!this._children.some((c) => c.id === category.id)) {
+  public set child(category: Category | null) {
+    if (!category) {
+      return;
+    }
+    if (this._children.every((c) => c.id !== category.id)) {
       this._children.push(category);
     }
   }
 
-  public set parent(category: Category) {
+  public set parent(category: Category | null) {
     this._parent = category;
   }
 }

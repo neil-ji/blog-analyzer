@@ -1,3 +1,4 @@
+import { Article } from "../..";
 import { Category } from "./Category";
 
 export class CategoryTree {
@@ -11,13 +12,27 @@ export class CategoryTree {
   }
 
   public link(categories: Category[]) {
-    let p = this._root;
     let prev: Category | null = null;
-    for (let i = 0; i < categories.length; i++, prev = p) {
-      if (prev) {
-        p.parent = prev;
-      }
-      p.child = categories[i];
+    let i = 0;
+    while (i < categories.length) {
+      categories[i].parent = prev;
+      prev && (prev.child = categories[i]);
+      prev = categories[i];
+      i++;
+    }
+  }
+
+  /**
+   * 层序遍历
+   * @param callback 回调函数
+   */
+  public traverse(callback: (category: Category) => void) {
+    const stack: Category[] = [];
+    stack.push(this._root);
+    while (stack.length) {
+      const category = stack.pop()!;
+      callback(category);
+      stack.push(...category.children);
     }
   }
 }

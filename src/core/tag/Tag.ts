@@ -2,16 +2,12 @@ import { Article } from "../article/Article";
 import { ITag } from "../../interface";
 import { getId } from "../../util";
 
-interface ITagConstructorParams {
-  name: string;
-}
-
 export class Tag implements ITag {
   private _id: string;
   private _name: string;
   private _articles: Article[];
 
-  constructor({ name }: ITagConstructorParams) {
+  constructor(name: string) {
     this._id = getId(name);
     this._name = name;
     this._articles = [];

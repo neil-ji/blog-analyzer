@@ -5,11 +5,16 @@ import { join } from "path";
 export class FileProcessor {
   constructor(private input: string) {}
   private async getFileList(path: string): Promise<Array<IFileWithStats>> {
-    const files = await readdir(path, { withFileTypes: true, recursive: true });
+    const filesAndDirs = await readdir(path, {
+      withFileTypes: true,
+      recursive: true,
+    });
+    const files = filesAndDirs.filter((file) => file.isFile());
     const works = files.map(async (file) => {
+      const filePath = join(file.parentPath, file.name);
       const [content, stats] = await Promise.all([
-        readFile(join(path, file.name), "utf-8"),
-        stat(join(path, file.name)),
+        readFile(filePath, "utf-8"),
+        stat(filePath),
       ]);
 
       return {
@@ -25,16 +30,15 @@ export class FileProcessor {
   public async readAll(
     callback: (file: IFileWithStats) => Promise<void>,
     concurrent?: boolean | undefined
-  ): Promise<void> {
+  ): Promise<any> {
     const files = await this.getFileList(this.input);
     // 并发模式
     if (concurrent) {
-      Promise.all(
+      return Promise.all(
         files.map(async (file) => {
           return callback(file);
         })
       );
-      return;
     }
     // 串行模式
     files.reduce((pre, cur) => {

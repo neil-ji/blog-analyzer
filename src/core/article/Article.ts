@@ -1,9 +1,9 @@
 import { IArticle } from "../../interface";
-import { getId } from "../../util";
 import { Category } from "../category/Category";
 import { Tag } from "../tag/Tag";
 
 interface IArticleConstructorParams {
+  id: string;
   title: string;
   content: string;
   created: string;
@@ -20,12 +20,13 @@ export class Article implements IArticle {
   private _category: Category | null;
 
   constructor({
+    id,
     content,
     title,
     created,
     modified,
   }: IArticleConstructorParams) {
-    this._id = getId(title);
+    this._id = id;
     this._title = title;
     this._content = content;
     this._created = new Date(created);
@@ -63,11 +64,12 @@ export class Article implements IArticle {
   }
 
   public set tags(tags: Array<Tag>) {
-    const ids = new Set(tags.map((tag) => tag.id));
+    const ids = new Set();
 
     tags.forEach((tag) => {
       if (!ids.has(tag.id)) {
         this._tags.push(tag);
+        ids.add(tag.id);
       }
     });
   }

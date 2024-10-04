@@ -7,15 +7,15 @@ import { Category } from "./category/Category";
 import { CategoryTree } from "./category/CategoryTree";
 import { TagSet } from "./tag/TagSet";
 import { Tag } from "./tag/Tag";
-import { pooling } from "../util";
+import { getId, pooling } from "../util";
 import { IFrontmatterKeys } from "../interface";
 
 export const analyze = async (
   input: string,
   frontmatterKeys: IFrontmatterKeys = {
     title: "title",
-    tag: "tags",
-    category: "categories",
+    tag: "tag",
+    category: "category",
   }
 ) => {
   if (!input || typeof input !== "string") {
@@ -34,33 +34,39 @@ export const analyze = async (
     // 1. 解析 Markdown Frontmatter
     const { data, content } = formatFrontmatter(file.content);
 
-    // 2. 实例化 Article
+    // 2. Article 实例化
     const article = new Article({
+      id: getId(file.dirent.parentPath + file.dirent.name),
       content,
-      title: data[frontmatterKeys.title],
-      created: data.created,
-      modified: data.modified,
+      title: data[frontmatterKeys.title]
+        ? String(data[frontmatterKeys.title])
+        : file.dirent.name,
+      created: data.created || file.stats.ctime,
+      modified: data.modified || file.stats.mtime,
     });
 
-    // 3. Tag 和 Category 实例化，同时建立与 Article 的关系
-    const tags: Tag[] = (data[frontmatterKeys.tag] || []).map((tag: string) => {
-      const tagInstance = createTag(tag)({ name: tag });
+    // 3.1 Tag 实例化，并绑定 Article
+    const tags: Tag[] = [];
+    data[frontmatterKeys.tag]?.forEach((tag: string) => {
+      const _tag = String(tag);
+      const tagInstance = createTag(_tag)(_tag);
       tagInstance.article = article;
-      return tagInstance;
+      tags.push(tagInstance);
     });
-    const categories: Category[] = (data[frontmatterKeys.category] || []).map(
-      (category: string) => {
-        const categoryInstance = createCategory(category)({ name: category });
-        categoryInstance.article = article;
-        return categoryInstance;
-      }
-    );
 
-    // 4. 建立 Article 与 Tag、Category 的关系
+    // 3.2 Category 实例化，并绑定 Article
+    const categories: Category[] = [categoryTree.root];
+    data[frontmatterKeys.category]?.forEach((category: string) => {
+      const _category = String(category);
+      const categoryInstance = createCategory(_category)(_category);
+      categories.push(categoryInstance);
+    });
+    categories[categories.length - 1].article = article;
+
+    // 4. Article 绑定 Tag、Category
     article.tags = tags;
-    article.category = categories[categories.length - 1] || null;
+    article.category = categories[categories.length - 1];
 
-    // TODO：此处 TagSet 与 Tag 池化出现冗余
     // 5. 收集 Article、Tag、Category
     categoryTree.link(categories);
     tagSet.add(tags);
