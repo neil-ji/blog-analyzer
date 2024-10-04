@@ -2,7 +2,7 @@ module.exports = {
   entry: "./src/index.ts",
   target: "node",
   output: {
-    filename: "bundle.js",
+    filename: "index.js",
     path: __dirname + "/dist",
   },
   resolve: {
