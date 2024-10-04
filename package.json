@@ -1,9 +1,9 @@
 {
   "name": "blog-analyzer",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "从博客中提取数据",
-  "main": "dist/bundle.js",
-  "types": "dist/bundle.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "webpack --mode production"
   },
